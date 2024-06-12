@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!--  
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+    <title>RECIST Calculator</title>
+    <link rel="stylesheet" href="RECIST-styles.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href='RECIST-home.html'>Home</a></li>
+                <li><a href='RECIST-calculator2.html'>Calculator</a></li>
+                <li><a href='RECIST-about.html'>About</a></li>
+                <li><a href='RECIST-contact.html'>Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+    <h1>SAbR RECIST Calculator</h1>
+    <p>Use this calculator to input the longest diameter of target lesions (in mm) to calculate percent change in size
+        and the type of disease. The calculator will sum the baseline and after treatment diameters and find the percent
+        change from baseline, displayed below. Please read the notes at the bottom of the page before
+        using.
+        <br><br>
+        Disclaimer: The information displayed by this calculator is not an appropriate substitute for clinical diagnoses
+        or judgements.
+        <br></br>
+    </p>
+
+    <div class="calculator">
+
+        <div class="button">
+            <span class="lesions-label">Number of Lesions: </span>
+            <button class="btn-1" onclick="addRow()">+</button>
+            <button class="btn-2" onclick="removeRow()">&#x2212</button>
+            <span class="timepoints-label">Number of Treatments: </span>
+            <button class="btn-3" onclick="addColumn()">+</button>
+            <button class="btn-4" onclick="removeColumn()">&#x2212</button>
+        </div>
+
+        <table id="myTable">
+            <tr>
+                <th></th>
+                <th class="columnlabel">Baseline (mm)</th>
+                <th class="columnlabel">Treatment 1</th>
+            </tr>
+            <tr>
+                <td class="rowlabel">Lesion 1</td>
+                <td><input type="text" oninput="validateInput(this)"></td>
+                <td><input type="text" oninput="validateInput(this)"></td>
+            </tr>
+            <tr>
+                <td class="rowlabel">Sum of diameters (SD):</td>
+                <td><input type="text" disabled></td>
+                <td><input type="text" disabled></td>
+            </tr>
+            <tr>
+                <td class="rowlabel">% Change SD from baseline:</td>
+                <td><input type="text" disabled></td>
+                <td><input type="text" disabled></td>
+            </tr>
+            <tr>
+                <td class="rowlabel">Target lesion response:</td>
+                <td><input type="text" disabled></td>
+                <td><input type="text" disabled></td>
+            </tr>
+        </table>
+
+        <!--div class="checkbox">
+            <label>Appearance of other lesions?</label>
+            <input type="checkbox">
+        </div-->
+
+        <div class="button">
+            <button class="btn-5" onClick="calculate()">Calculate</button>
+            <button class="btn-6" onClick="reset()">Reset</button>
+        </div>
+    </div>
+
+
+    <br><br>
+    <h3>Notes:</h3>
+    <p> Complete Response (CR): full disappearance of all target and non-target lesions
+        <br><br>
+        Partial Response (PR): ≥30% decrease in the SLD of target lesions
+        <br><br>
+        Stable Disease (SD): No significant progression or response (20% > Percent Change > -30%))
+        <br><br>
+        Progressive Disease (PD): ≥20% increase in the target lesions size AND an absolute increase in sum of longest
+        diameters of at least 5 mm OR formation of new lesions
+        <br></br>
+    </p>
+    <script>
+        var lesionCount = 1;
+        var treatmentCount = 1;
+
+        function addRow() {
+            lesionCount++;
+            var table = document.getElementById("myTable");
+            var row = table.insertRow(lesionCount);
+            var cell1 = row.insertCell(0);
+            cell1.innerHTML = "Lesion " + lesionCount;
+            for (var i = 1; i <= treatmentCount + 1; i++) {
+                var cell = row.insertCell(i);
+                cell.innerHTML = "<input type='text' oninput='validateInput(this)'>";
+            }
+        }
+
+        function removeRow() {
+            if (lesionCount > 1) {
+                document.getElementById("myTable").deleteRow(lesionCount);
+                lesionCount--;
+            }
+        }
+
+        function addColumn() {
+            treatmentCount++;
+            var table = document.getElementById("myTable");
+            for (var i = 0; i < table.rows.length; i++) {
+                var cell = table.rows[i].insertCell(treatmentCount + 1);
+                if (table.rows[i].cells[0].innerHTML.startsWith("Sum of diameters (SD):") ||
+                    table.rows[i].cells[0].innerHTML.startsWith("% Change SD from baseline:") ||
+                    table.rows[i].cells[0].innerHTML.startsWith("Target lesion response:")) {
+                    cell.innerHTML = "<input type='text' disabled>";
+                } else {
+                    cell.innerHTML = "<input type='text'>";
+                }
+            }
+            table.rows[0].cells[treatmentCount + 1].innerHTML = "Treatment " + treatmentCount;
+        }
+
+        function removeColumn() {
+            if (treatmentCount > 1) {
+                var table = document.getElementById("myTable");
+                for (var i = 0; i < table.rows.length; i++) {
+                    table.rows[i].deleteCell(treatmentCount + 1);
+                }
+                treatmentCount--;
+            }
+        }
+
+        function validateInput(input) {
+            input.value = input.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');
+        }
+
+
+        function calculate() {
+            var table = document.getElementById("myTable");
+            var baselineSum = 0;
+            for (var i = 1; i <= lesionCount; i++) {
+                var value = parseFloat(table.rows[i].cells[1].children[0].value);
+                if (!isNaN(value)) {
+                    baselineSum += value;
+                }
+            }
+            table.rows[lesionCount + 1].cells[1].children[0].value = baselineSum.toFixed(2);
+
+            for (var j = 2; j <= treatmentCount + 1; j++) {
+                var sum = 0;
+                for (var i = 1; i <= lesionCount; i++) {
+                    var value = parseFloat(table.rows[i].cells[j].children[0].value);
+                    if (!isNaN(value)) {
+                        sum += value;
+                    }
+                }
+                table.rows[lesionCount + 1].cells[j].children[0].value = sum.toFixed(2);
+                var percentChange = ((sum - baselineSum) / baselineSum) * 100;
+                table.rows[lesionCount + 2].cells[j].children[0].value = percentChange.toFixed(2) + "%";
+
+                var response = "";
+                if (percentChange == -100) {
+                    response = "Complete Response (CR)";
+                } else if (percentChange <= -30) {
+                    response = "Partial Response (PR)";
+                } else if (percentChange >= 20 && (sum - baselineSum) >= 5) {
+                    response = "Progressive Disease (PD)";
+                } else if ((percentChange < 20 && percentChange > -30) || (percentChange >= 20 && (sum - baselineSum) < 5)) {
+                    response = "Stable Disease (SD)";
+                }
+                table.rows[lesionCount + 3].cells[j].children[0].value = response;
+            }
+        }
+
+        function reset() {
+            var table = document.getElementById("myTable");
+            for (var i = 1; i <= lesionCount; i++) {
+                for (var j = 1; j <= treatmentCount + 1; j++) {
+                    table.rows[i].cells[j].children[0].value = "";
+                }
+            }
+            for (var j = 1; j <= treatmentCount + 1; j++) {
+                table.rows[lesionCount + 1].cells[j].children[0].value = "";
+                table.rows[lesionCount + 2].cells[j].children[0].value = "";
+                table.rows[lesionCount + 3].cells[j].children[0].value = "";
+            }
+        }
+
+
+
+
+    </script>
+</body>
+
+</html>
