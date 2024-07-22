@@ -22,13 +22,13 @@
     </header>
     <h1>SAbR RECIST Calculator</h1>
     <p>Use this calculator to input the longest diameter of target lesions (in mm) to calculate percent change in size
-        and the type of disease. The calculator will sum the baseline and after treatment diameters and find the percent
-        change from baseline, displayed below. Please read the notes at the bottom of the page before
-        using.
+        and the type of disease. The calculator will sum the baseline and follow-up lesion diameters and find the percent
+        change from the baseline, which will be displayed below. Please read the notes at the bottom of the page before
+        using, particularly with Brain Lesions or Brain Metastases.
         <br><br>
         Disclaimer: The information displayed by this calculator is not an appropriate substitute for clinical diagnoses
         or judgements.
-        <br></br>
+        <br><br>
     </p>
 
     <div class="calculator">
@@ -37,19 +37,29 @@
             <span class="lesions-label">Number of Lesions: </span>
             <button class="btn-1" onclick="addRow()">+</button>
             <button class="btn-2" onclick="removeRow()">&#x2212</button>
-            <span class="timepoints-label">Number of Treatments: </span>
+            <span class="timepoints-label">Number of Follow-Ups: </span>
             <button class="btn-3" onclick="addColumn()">+</button>
             <button class="btn-4" onclick="removeColumn()">&#x2212</button>
+        </div>
+
+        <div>
+            <h4>Select Lesion Type (Required):</h4>
+            <select id="lesionType" name="Lesion Type" required>
+                <option>Select Lesion Type</option>
+                <option value="visceral">Visceral Metastasis</option>
+                <option value="lymph">Lymph Node</option>
+                <option value="bone">Bone Lesion</option>
+            </select>
         </div>
 
         <table id="myTable">
             <tr>
                 <th></th>
                 <th class="columnlabel">Baseline (mm)</th>
-                <th class="columnlabel">Treatment 1</th>
+                <th class="columnlabel">Follow-Up #1 (mm)</th>
             </tr>
             <tr>
-                <td class="rowlabel">Lesion 1</td>
+                <td class="rowlabel">Lesion #1</td>
                 <td><input type="text" oninput="validateInput(this)"></td>
                 <td><input type="text" oninput="validateInput(this)"></td>
             </tr>
@@ -84,27 +94,45 @@
 
     <br><br>
     <h3>Notes:</h3>
-    <p> Complete Response (CR): full disappearance of all target and non-target lesions
+    <p> Complete Response (CR): <br>
+        Full disappearance of all target and non-target lesions.
         <br><br>
-        Partial Response (PR): ≥30% decrease in the SLD of target lesions
+        Partial Response (PR): <br>
+        ≥ 30% decrease in the SLD of target lesions.
         <br><br>
-        Stable Disease (SD): No significant progression or response (20% > Percent Change > -30%))
+        Stable Disease (SD): <br>
+        No significant progression or response (20% > Percent Change > -30%).
         <br><br>
-        Progressive Disease (PD): ≥20% increase in the target lesions size AND an absolute increase in sum of longest
-        diameters of at least 5 mm OR formation of new lesions
-        <br></br>
+        Progressive Disease (PD): <br>
+        - Visceral Metastasis (lung, soft tissue etc.) ≥ 10 mm: increase by at least 5 mm or appearance of ≥ 1 visceral
+        new lesion; confirmation on subsequent scans at least 4 weeks later is required. <br> - Visceral Metastasis
+        (lung, soft tissue etc.) < 10 mm: increase to ≥ 10 mm or appearance of ≥ 1 new visceral lesion > 5mm;
+            confirmation on subsequent scans at least 4 weeks later is required. <br><br> - Lymph node ≥ 15 mm in short
+            axis: increase by at least 5 mm or appearance of ≥ 1 new lymph node lesion > 5 mm; confirmation on
+            subsequent scans at least 4 weeks later is required. <br><br> - Bone lesions ≥ 10 mm for the soft tissue
+            component of the lesion: increase by at least 5mm or appearance of ≥ 1 new lytic lesion > 5 mm. A positive
+            radiographic study such as bone scan with 2 or more new lesions that are confirmed with MRI or CT. For a
+            solitary lesion or equivocal finding on a scan, biopsy is required or subsequent scans demonstrating growth
+            or at least one new bone lesion at least 4 weeks later. Note that renal cell carcinoma osseous metastases
+            are primarily osteolytic and not osteoblastic. Sclerotic portions of any osseous lesions will not be
+            considered for RECIST assessment. <br> - Bone lesions < 10 mm for the soft tissue component of the lesion:
+                increase to ≥ 10 mm ; confirmation on subsequent scans at least 4 weeks later is required. <br><br> -
+                Brain lesions: a positive brain CT or MRI. <br> - Brain metastasis will be treated same as non-brain
+                metastases and SRS will be offered and it will count towards the 6 lesion SAbR limit. In the control
+                Arm, as brain metastasis is a palliative treatment and a standard of care, SRS will also be offered to
+                those patients. <br><br>
     </p>
     <script>
         var lesionCount = 1;
-        var treatmentCount = 1;
+        var followupCount = 1;
 
         function addRow() {
             lesionCount++;
             var table = document.getElementById("myTable");
             var row = table.insertRow(lesionCount);
             var cell1 = row.insertCell(0);
-            cell1.innerHTML = "Lesion " + lesionCount;
-            for (var i = 1; i <= treatmentCount + 1; i++) {
+            cell1.innerHTML = "Lesion #" + lesionCount;
+            for (var i = 1; i <= followupCount + 1; i++) {
                 var cell = row.insertCell(i);
                 cell.innerHTML = "<input type='text' oninput='validateInput(this)'>";
             }
@@ -118,10 +146,10 @@
         }
 
         function addColumn() {
-            treatmentCount++;
+            followupCount++;
             var table = document.getElementById("myTable");
             for (var i = 0; i < table.rows.length; i++) {
-                var cell = table.rows[i].insertCell(treatmentCount + 1);
+                var cell = table.rows[i].insertCell(followupCount + 1);
                 if (table.rows[i].cells[0].innerHTML.startsWith("Sum of diameters (SD):") ||
                     table.rows[i].cells[0].innerHTML.startsWith("% Change SD from baseline:") ||
                     table.rows[i].cells[0].innerHTML.startsWith("Target lesion response:")) {
@@ -130,77 +158,85 @@
                     cell.innerHTML = "<input type='text'>";
                 }
             }
-            table.rows[0].cells[treatmentCount + 1].innerHTML = "Treatment " + treatmentCount;
+            table.rows[0].cells[followupCount + 1].innerHTML = "Follow-Up #" + followupCount + " (mm)";
         }
 
         function removeColumn() {
-            if (treatmentCount > 1) {
+            if (followupCount > 1) {
                 var table = document.getElementById("myTable");
                 for (var i = 0; i < table.rows.length; i++) {
-                    table.rows[i].deleteCell(treatmentCount + 1);
+                    table.rows[i].deleteCell(followupCount + 1);
                 }
-                treatmentCount--;
-            }
+                followupCount--;
+            } 
         }
 
         function validateInput(input) {
             input.value = input.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');
         }
 
-
         function calculate() {
             var table = document.getElementById("myTable");
+            var lesionType = document.getElementById("lesionType").value;
             var baselineSum = 0;
             for (var i = 1; i <= lesionCount; i++) {
-                var value = parseFloat(table.rows[i].cells[1].children[0].value);
-                if (!isNaN(value)) {
-                    baselineSum += value;
+                var baseline = parseFloat(table.rows[i].cells[1].children[0].value);
+                if (!isNaN(baseline)) {
+                    baselineSum += baseline;
                 }
             }
             table.rows[lesionCount + 1].cells[1].children[0].value = baselineSum.toFixed(2);
-
-            for (var j = 2; j <= treatmentCount + 1; j++) {
+            for (var j = 2; j <= followupCount + 1; j++) {
                 var sum = 0;
+                var isProgressive = false;
                 for (var i = 1; i <= lesionCount; i++) {
                     var value = parseFloat(table.rows[i].cells[j].children[0].value);
                     if (!isNaN(value)) {
                         sum += value;
+                        if (!isProgressive) {
+                            var baseline = parseFloat(table.rows[i].cells[1].children[0].value);
+                            if (lesionType == "visceral" && ((baseline >= 10 && (value - baseline) >= 5) || (baseline < 10 && value >= 10))) {
+                                isProgressive = true;
+                            } else if (lesionType == "lymph" && baseline >= 15 && (value - baseline) >= 5) {
+                                isProgressive = true;
+                            } else if (lesionType == "bone" && ((baseline >= 10 && (value - baseline) >= 5) || (baseline < 10 && value >= 10))) {
+                                isProgressive = true;
+                            }
+                        }
                     }
                 }
                 table.rows[lesionCount + 1].cells[j].children[0].value = sum.toFixed(2);
                 var percentChange = ((sum - baselineSum) / baselineSum) * 100;
                 table.rows[lesionCount + 2].cells[j].children[0].value = percentChange.toFixed(2) + "%";
-
                 var response = "";
                 if (percentChange == -100) {
                     response = "Complete Response (CR)";
                 } else if (percentChange <= -30) {
                     response = "Partial Response (PR)";
-                } else if (percentChange >= 20 && (sum - baselineSum) >= 5) {
-                    response = "Progressive Disease (PD)";
                 } else if ((percentChange < 20 && percentChange > -30) || (percentChange >= 20 && (sum - baselineSum) < 5)) {
                     response = "Stable Disease (SD)";
+                }
+                if (isProgressive) {
+                    response = "Progressive Disease (PD)";
                 }
                 table.rows[lesionCount + 3].cells[j].children[0].value = response;
             }
         }
 
+
         function reset() {
             var table = document.getElementById("myTable");
             for (var i = 1; i <= lesionCount; i++) {
-                for (var j = 1; j <= treatmentCount + 1; j++) {
+                for (var j = 1; j <= followupCount + 1; j++) {
                     table.rows[i].cells[j].children[0].value = "";
                 }
             }
-            for (var j = 1; j <= treatmentCount + 1; j++) {
+            for (var j = 1; j <= followupCount + 1; j++) {
                 table.rows[lesionCount + 1].cells[j].children[0].value = "";
                 table.rows[lesionCount + 2].cells[j].children[0].value = "";
                 table.rows[lesionCount + 3].cells[j].children[0].value = "";
             }
         }
-
-
-
 
     </script>
 </body>
