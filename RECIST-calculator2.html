@@ -22,7 +22,8 @@
     </header>
     <h1>SAbR RECIST Calculator</h1>
     <p>Use this calculator to input the longest diameter of target lesions (in mm) to calculate percent change in size
-        and the type of disease. The calculator will sum the baseline and follow-up lesion diameters and find the percent
+        and the type of disease. The calculator will sum the baseline and follow-up lesion diameters and find the
+        percent
         change from the baseline, which will be displayed below. Please read the notes at the bottom of the page before
         using, particularly with Brain Lesions or Brain Metastases.
         <br><br>
@@ -30,17 +31,7 @@
         or judgements.
         <br><br>
     </p>
-
     <div class="calculator">
-
-        <div class="button">
-            <span class="lesions-label">Number of Lesions: </span>
-            <button class="btn-1" onclick="addRow()">+</button>
-            <button class="btn-2" onclick="removeRow()">&#x2212</button>
-            <span class="timepoints-label">Number of Follow-Ups: </span>
-            <button class="btn-3" onclick="addColumn()">+</button>
-            <button class="btn-4" onclick="removeColumn()">&#x2212</button>
-        </div>
 
         <div>
             <h4>Select Lesion Type (Required):</h4>
@@ -51,6 +42,16 @@
                 <option value="bone">Bone Lesion</option>
             </select>
         </div>
+
+        <div class="button">
+            <span class="lesions-label">Number of Lesions: </span>
+            <button class="btn-1" onclick="addRow()">+</button>
+            <button class="btn-2" onclick="removeRow()">&#x2212</button>
+            <span class="timepoints-label">Number of Follow-Ups: </span>
+            <button class="btn-3" onclick="addColumn()">+</button>
+            <button class="btn-4" onclick="removeColumn()">&#x2212</button>
+        </div>
+
 
         <table id="myTable">
             <tr>
@@ -106,7 +107,7 @@
         Progressive Disease (PD): <br>
         - Visceral Metastasis (lung, soft tissue etc.) ≥ 10 mm: increase by at least 5 mm or appearance of ≥ 1 visceral
         new lesion; confirmation on subsequent scans at least 4 weeks later is required. <br> - Visceral Metastasis
-        (lung, soft tissue etc.) < 10 mm: increase to ≥ 10 mm or appearance of ≥ 1 new visceral lesion > 5mm;
+        (lung, soft tissue etc.) < 10 mm: increase to ≥ 10 mm or appearance of ≥ 1 new visceral lesion > 5 mm;
             confirmation on subsequent scans at least 4 weeks later is required. <br><br> - Lymph node ≥ 15 mm in short
             axis: increase by at least 5 mm or appearance of ≥ 1 new lymph node lesion > 5 mm; confirmation on
             subsequent scans at least 4 weeks later is required. <br><br> - Bone lesions ≥ 10 mm for the soft tissue
@@ -168,7 +169,7 @@
                     table.rows[i].deleteCell(followupCount + 1);
                 }
                 followupCount--;
-            } 
+            }
         }
 
         function validateInput(input) {
